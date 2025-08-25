@@ -20,10 +20,69 @@
  * - NO cambies la firma de sort_matrix().
  */
 
-void sort_matrix(int **matrix, int n) {
-    // TODO: Implementa aquí el algoritmo.
-    // Necesitarás el método de inserción,
-    // pero recuerda aplicar la regla de mover toda la columna.
+void sort_matrix(int **matriz, int n) {
+    for (int filaObjetivo = 0; filaObjetivo < n; filaObjetivo++) {                   // Recorre cada fila donde fijaremos valores de izquierda a derecha
+        for (int colObjetivo = 0; colObjetivo < n; colObjetivo++) {                  // Recorre cada columna destino dentro de la fila actual
+
+            int filaMin = filaObjetivo;                                              // Fila del valor minimo encontrado (inicialmente, la celda destino)
+            int colMin  = colObjetivo;                                               // Columna del valor minimo hallado
+            int valorMin = matriz[filaObjetivo][colObjetivo];                        // Valor minimo actual (inicialmente, el de la celda destino)
+
+            for (int fila = filaObjetivo; fila < n; fila++) {                        // Busca el valor minimo en la submatriz no fijada
+                for (int columna = 0; columna < n; columna++) {                      // Recorre todas las columnas
+                    if (fila == filaObjetivo && columna < colObjetivo) continue;     // No toca el prefijo ya fijado de la fila actual
+                    if (matriz[fila][columna] < valorMin) {                          // Si encontramos un valor más pequeño
+                        valorMin = matriz[fila][columna];                            // Actualizamos el valor minimo
+                        filaMin  = fila;                                             // Guardamos su fila
+                        colMin   = columna;                                          // Guardamos su columna
+                    }
+                }
+            }
+
+            if (filaMin > filaObjetivo) {                                            // El valor minimo esta por debajo de la fila objetivo
+                while (colMin < colObjetivo) {                                       // Lo movemos horizontalmente a la derecha
+                    for (int f = filaObjetivo + 1; f < n; f++) {                     // Intercambiamos solo la cola
+                        int tmp = matriz[f][colMin];                               
+                        matriz[f][colMin] = matriz[f][colMin + 1];
+                        matriz[f][colMin + 1] = tmp;
+                    }
+                    colMin++;                                                        // Avanzamos la columna del valor minimo
+                }
+                while (colMin > colObjetivo) {                                       // Lo movemos horizontalmente a la izquierda
+                    for (int f = filaObjetivo + 1; f < n; f++) {                     // De nuevo, solo en la cola (no tocamos las filas superiores)
+                        int tmp = matriz[f][colMin];                             
+                        matriz[f][colMin] = matriz[f][colMin - 1];
+                        matriz[f][colMin - 1] = tmp;
+                    }
+                    colMin--;                                                        // Retrocedemos la columna del valor minimo
+                }
+            } else {                                                                  // El valor minimo ya está en la misma fila objetivo
+                while (colMin < colObjetivo) {                                       // Si está a la izquierda, lo movemos a la derecha
+                    for (int f = filaObjetivo; f < n; f++) {                         // Intercambiamos columnas desde filaObjetivo hacia abajo
+                        int tmp = matriz[f][colMin];                                 
+                        matriz[f][colMin] = matriz[f][colMin + 1];
+                        matriz[f][colMin + 1] = tmp;
+                    }
+                    colMin++;                                                        // Avanzamos la columna del valor minimo
+                }
+                while (colMin > colObjetivo) {                                       // Si está a la derecha, lo movemos a la izquierda
+                    for (int f = filaObjetivo; f < n; f++) {                         // Intercambiamos las columnas desde filaObjetivo hacia abajo
+                        int tmp = matriz[f][colMin];                                 
+                        matriz[f][colMin] = matriz[f][colMin - 1];
+                        matriz[f][colMin - 1] = tmp;
+                    }
+                    colMin--;                                                        // Retrocedemos la columna del valor minimo
+                }
+            }
+
+            while (filaMin > filaObjetivo) {                                         // Una vez alineada la columna, subimos el valor minimo verticalmente
+                int tmp = matriz[filaMin][colObjetivo];                              
+                matriz[filaMin][colObjetivo] = matriz[filaMin - 1][colObjetivo];
+                matriz[filaMin - 1][colObjetivo] = tmp;
+                filaMin--;                                                           // Seguimos subiendo hasta la fila objetivo
+            }
+        }
+    }
 }
 
 int main() {
